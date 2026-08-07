@@ -493,7 +493,13 @@ def get_media_data():
         try:
             # True parent show IMDb ID from TvShow properties
             parent_imdb_raw = (xbmc.getInfoLabel("ListItem.Property(TvShow.IMDBNumber)")
-                               or xbmc.getInfoLabel("VideoPlayer.TvShow.IMDBNumber"))
+                               or xbmc.getInfoLabel("VideoPlayer.IMDBNumber"))
+            
+            tag = xbmc.Player().getVideoInfoTag()
+            imdb_id = tag.getUniqueID('imdb')
+            if not imdb_id:
+                parent_imdb_raw = ''    
+            
             imdb_digits = _strip_imdb_tt(parent_imdb_raw)
             if imdb_digits and 6 <= len(imdb_digits) <= 8:
                 item["parent_imdb_id"] = int(imdb_digits)
@@ -680,6 +686,11 @@ def get_media_data():
             item["parent_imdb_id"] = None  # Clear parent IDs
             item["parent_tmdb_id"] = None
             item["tmdb_id"] = None         # Clear conflicting episode ID
+            
+            item["query"] = " "            # If imdb id is provided then don't add query because result will be empty then
+            item["season_number"] = None   # If imdb id is provided then don't add season because result will be empty then
+            item["episode_number"] = None  # If imdb id is provided then don't add episode because result will be empty then    
+            
             log(__name__, f"✅ Final Strategy: episode imdb_id={item['imdb_id']} (no season/episode)")
         elif item.get("tmdb_id"):
             # Strategy: Use episode-specific TMDb ID only
