@@ -492,14 +492,20 @@ def get_media_data():
         # 1) Try to get TRUE parent show IDs first (these are more reliable)
         try:
             # True parent show IMDb ID from TvShow properties
+            log(__name__, f"xbmc.getInfoLabel('ListItem.Property(TvShow.IMDBNumber)'): {xbmc.getInfoLabel('ListItem.Property(TvShow.IMDBNumber)')}")
+            log(__name__, f"xbmc.getInfoLabel('VideoPlayer.IMDBNumber'): {xbmc.getInfoLabel('VideoPlayer.IMDBNumber')}")
+            log(__name__, f"xbmc.getInfoLabel('VideoPlayer.TvShow.IMDBNumber'): {xbmc.getInfoLabel('VideoPlayer.TvShow.IMDBNumber')}")
             parent_imdb_raw = (xbmc.getInfoLabel("ListItem.Property(TvShow.IMDBNumber)")
                                or xbmc.getInfoLabel("VideoPlayer.IMDBNumber"))
-            
+            log(__name__, f"parent_imdb_raw: {parent_imdb_raw}")
+
             tag = xbmc.Player().getVideoInfoTag()
             imdb_id = tag.getUniqueID('imdb')
+            log(__name__, f"imdb_id: {imdb_id}")
             if not imdb_id:
                 parent_imdb_raw = ''    
-            
+            log(__name__, f"parent_imdb_raw: {parent_imdb_raw}")
+
             imdb_digits = _strip_imdb_tt(parent_imdb_raw)
             if imdb_digits and 6 <= len(imdb_digits) <= 8:
                 item["parent_imdb_id"] = int(imdb_digits)
@@ -507,6 +513,7 @@ def get_media_data():
 
             # True parent show TMDb ID (less common but check if available)
             parent_tmdb_raw = xbmc.getInfoLabel("VideoPlayer.TvShow.UniqueID(tmdb)")
+            log(__name__, f"parent_tmdb_raw: {parent_tmdb_raw}")
             if parent_tmdb_raw and parent_tmdb_raw.isdigit():
                 item["parent_tmdb_id"] = int(parent_tmdb_raw)
                 log(__name__, f"TRUE Parent Show TMDb ID: {item['parent_tmdb_id']}")
